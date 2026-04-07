@@ -5,3 +5,4 @@ openai
 python-docx
 pillow
 pytesseract
+requests
