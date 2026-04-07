@@ -3,9 +3,9 @@ from typing import List
 import shutil
 import os
 
-from services.processor import process_file
-from services.ai import generate_response
-from services.doc_generator import generate_doc
+from backend.services.processor import process_file
+from backend.services.ai import generate_response
+from backend.services.doc_generator import generate_doc
 
 app = FastAPI()
 
