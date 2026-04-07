@@ -13,13 +13,13 @@ headers = {
 
 
 PROMPT = """
-Actúa como experto en logística, sistemas WMS y redacción académica.
+Actúa como experto en logística y WMS.
 
-Desarrolla una respuesta estructurada tipo tesina con:
+Desarrolla una respuesta estructurada:
 
-1. Definición del problema
+1. Problema
 2. Justificación
-3. Propuesta de solución WMS
+3. Propuesta
 4. Conclusión
 
 Contenido:
@@ -27,33 +27,37 @@ Contenido:
 """
 
 
-def call_model(payload):
-    return requests.post(API_URL, headers=headers, json=payload)
-
-
 def generate_response(text):
     if not HF_API_TOKEN:
-        return "[ERROR] Falta configurar HF_API_TOKEN en Render"
+        return "[ERROR] Falta HF_API_TOKEN"
 
     payload = {
-        "inputs": PROMPT.format(input=text[:800])
+        "inputs": PROMPT.format(input=text[:500])  # más corto = más estable
     }
 
     try:
-        response = call_model(payload)
+        response = requests.post(API_URL, headers=headers, json=payload)
 
-        # 🔁 retry si el modelo está cargando
+        # 🔍 debug útil
+        if response.status_code != 200:
+            return f"[ERROR HTTP {response.status_code}] {response.text}"
+
+        # 🔁 retry si modelo cargando
         if response.status_code == 503:
             time.sleep(3)
-            response = call_model(payload)
+            response = requests.post(API_URL, headers=headers, json=payload)
 
-        result = response.json()
+        # 🔥 intentar parsear JSON seguro
+        try:
+            result = response.json()
+        except:
+            return f"[ERROR] Respuesta no JSON: {response.text[:200]}"
 
-        # respuesta válida
+        # ✅ respuesta válida
         if isinstance(result, list) and "generated_text" in result[0]:
             return result[0]["generated_text"]
 
-        # error de HuggingFace
+        # ⚠️ respuesta inesperada
         return f"[ERROR HF] {result}"
 
     except Exception as e:
