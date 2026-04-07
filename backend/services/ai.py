@@ -1,16 +1,21 @@
-from openai import OpenAI
+import requests
 import os
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+HF_API_TOKEN = os.getenv("HF_API_TOKEN")
+
+API_URL = "https://api-inference.huggingface.co/models/google/flan-t5-large"
+
+headers = {
+    "Authorization": f"Bearer {HF_API_TOKEN}"
+}
+
 
 PROMPT = """
-Actúa como experto en logística y redacción académica.
+Analiza el siguiente contenido como experto en logística.
 
-Analiza el contenido y:
-- detecta problemas
-- resume ideas
-- propone soluciones
-- genera texto tipo tesina
+1. Detecta problemas
+2. Resume ideas
+3. Propone soluciones tipo WMS
 
 Contenido:
 {input}
@@ -18,11 +23,14 @@ Contenido:
 
 
 def generate_response(text):
-    response = client.chat.completions.create(
-        model="gpt-4.1-mini",
-        messages=[
-            {"role": "user", "content": PROMPT.format(input=text)}
-        ]
-    )
+    payload = {
+        "inputs": PROMPT.format(input=text[:1000])  # limitamos tamaño
+    }
 
-    return response.choices[0].message.content
+    response = requests.post(API_URL, headers=headers, json=payload)
+
+    try:
+        result = response.json()
+        return result[0]["generated_text"]
+    except:
+        return f"Error en modelo IA: {response.text}"
