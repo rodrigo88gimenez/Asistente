@@ -17,7 +17,7 @@ async function upload() {
         formData.append('files', files[i]);
     }
 
-    const res = await fetch('http://localhost:8000/upload', {
+    const res = await fetch('https://asistente-12gk.onrender.com/upload', {
         method: 'POST',
         body: formData
     });
