@@ -11,11 +11,13 @@ headers = {
 
 
 PROMPT = """
-Analiza el siguiente contenido como experto en logística.
+Actúa como experto en logística y redacción académica.
 
-1. Detecta problemas
-2. Resume ideas
-3. Propone soluciones tipo WMS
+Analiza el contenido y:
+- detecta problemas
+- resume ideas
+- propone soluciones tipo WMS
+- redacta en formato claro tipo tesina
 
 Contenido:
 {input}
@@ -24,13 +26,14 @@ Contenido:
 
 def generate_response(text):
     payload = {
-        "inputs": PROMPT.format(input=text[:1000])  # limitamos tamaño
+        "inputs": PROMPT.format(input=text[:1000])
     }
 
-    response = requests.post(API_URL, headers=headers, json=payload)
-
     try:
+        response = requests.post(API_URL, headers=headers, json=payload)
         result = response.json()
+
         return result[0]["generated_text"]
-    except:
-        return f"Error en modelo IA: {response.text}"
+
+    except Exception as e:
+        return f"Error IA: {str(e)}"

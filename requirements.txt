@@ -1,8 +1,5 @@
 fastapi
 uvicorn
 python-multipart
-openai
-python-docx
-pillow
-pytesseract
 requests
+python-docx

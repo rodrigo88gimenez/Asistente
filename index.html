@@ -7,8 +7,15 @@
 
 <h1>Asistente Web - IA</h1>
 
+<h3>Escribí contexto:</h3>
+<textarea id="textInput" rows="6" cols="60" placeholder="Ej: problema de staging, ideas, etc..."></textarea>
+<br><br>
+
+<h3>Subir archivos:</h3>
 <input type="file" id="files" multiple />
-<button onclick="upload()">Subir archivos</button>
+
+<br><br>
+<button onclick="upload()">Enviar</button>
 
 <h3>Respuesta:</h3>
 <pre id="output"></pre>
@@ -16,13 +23,16 @@
 <script>
 async function upload() {
     const files = document.getElementById('files').files;
+    const text = document.getElementById('textInput').value;
 
-    if (files.length === 0) {
-        alert("Subí al menos un archivo");
+    if (files.length === 0 && text.trim() === "") {
+        alert("Ingresá texto o subí archivos");
         return;
     }
 
     const formData = new FormData();
+
+    formData.append("text", text);
 
     for (let i = 0; i < files.length; i++) {
         formData.append('files', files[i]);
@@ -41,7 +51,7 @@ async function upload() {
 
     } catch (error) {
         document.getElementById('output').innerText =
-            "Error conectando con backend: " + error;
+            "Error: " + error;
     }
 }
 </script>
